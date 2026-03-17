@@ -1,59 +1,209 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# StandupBot
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> Application SaaS de daily standups asynchrones pour équipes remote.  
+> Chaque membre soumet son standup quotidien, le manager voit un digest propre chaque matin.
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=flat&logo=laravel&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=flat&logo=php&logoColor=white)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fonctionnalités
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Authentification complète (inscription, connexion, vérification email, mot de passe oublié)
+- Multi-tenant — chaque équipe a son workspace isolé
+- Questions de standup configurables par workspace
+- Soumission quotidienne avec contrainte 1 standup / user / jour
+- Dashboard avec digest du jour, statut de l'équipe et statistiques
+- Système d'invitations par email avec token et expiration
+- Gestion des membres et des rôles (admin / membre)
+- Interface responsive — sidebar desktop, vue mobile adaptée
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Stack technique
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Couche | Technologie |
+|---|---|
+| Backend | Laravel 11 |
+| Base de données | PostgreSQL |
+| Frontend | Blade + CSS natif |
+| Auth | Laravel Breeze |
+| Serveur local | php artisan serve |
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Prérequis
 
-### Premium Partners
+- PHP >= 8.2
+- Composer
+- Node.js >= 18
+- PostgreSQL >= 14
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## Installation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Cloner le projet
 
-## Code of Conduct
+```bash
+git clone https://github.com/votre-username/standupbot.git
+cd standupbot
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 2. Installer les dépendances
 
-## Security Vulnerabilities
+```bash
+composer install
+npm install
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 3. Configurer l'environnement
 
-## License
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Editer `.env` et renseigner la connexion PostgreSQL :
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=standupbot
+DB_USERNAME=postgres
+DB_PASSWORD=votre_mot_de_passe
+
+APP_NAME=StandupBot
+APP_URL=http://localhost:8000
+```
+
+### 4. Créer la base de données
+
+```bash
+# Dans psql ou pgAdmin, créer la base
+createdb standupbot
+```
+
+### 5. Lancer les migrations
+
+```bash
+php artisan migrate
+```
+
+### 6. Compiler les assets
+
+```bash
+npm run build
+# ou en développement
+npm run dev
+```
+
+### 7. Lancer le serveur
+
+```bash
+php artisan serve
+```
+
+L'application est disponible sur [http://localhost:8000](http://localhost:8000).
+
+---
+
+## Structure du projet
+
+```
+app/
+├── Http/Controllers/
+│   ├── DashboardController.php     # Vue d'ensemble + stats
+│   ├── WorkspaceController.php     # Création et switch de workspace
+│   ├── StandupController.php       # Soumission et historique
+│   └── MemberController.php        # Gestion des membres + invitations
+├── Models/
+│   ├── User.php
+│   ├── Workspace.php
+│   ├── WorkspaceMember.php
+│   ├── Invitation.php
+│   ├── Standup.php
+│   ├── StandupQuestion.php
+│   └── StandupAnswer.php
+
+database/migrations/
+├── create_workspaces_table
+├── create_workspace_members_table
+├── create_invitations_table
+├── create_standup_questions_table
+├── create_standups_table
+├── create_standup_answers_table
+└── create_subscriptions_table
+
+resources/views/
+├── layouts/
+│   ├── app.blade.php               # Layout dashboard (sidebar)
+│   └── auth.blade.php              # Layout auth (split screen)
+├── auth/
+│   ├── login.blade.php
+│   └── register.blade.php
+├── workspaces/
+│   └── create.blade.php
+├── standups/
+│   └── create.blade.php
+├── members/
+│   └── index.blade.php
+└── dashboard.blade.php
+```
+
+---
+
+## Schéma de base de données
+
+```
+users
+  └── workspaces (owner_id)
+        ├── workspace_members (user_id, role)
+        ├── invitations (email, token, status)
+        ├── standup_questions (question, order)
+        ├── standups (user_id, date)
+        │     └── standup_answers (question_id, answer)
+        └── subscriptions (stripe_id, plan)
+```
+
+---
+
+## Flux utilisateur
+
+```
+Inscription
+    └── Création du workspace
+          └── Invitation des membres
+                └── Soumission quotidienne du standup
+                      └── Dashboard — digest de l'équipe
+```
+
+---
+
+## Variables d'environnement importantes
+
+| Variable | Description |
+|---|---|
+| `DB_CONNECTION` | Doit être `pgsql` |
+| `DB_DATABASE` | Nom de la base PostgreSQL |
+| `APP_KEY` | Généré via `php artisan key:generate` |
+| `MAIL_*` | Configuration email (pour les invitations) |
+
+---
+
+## Roadmap
+
+- [ ] Rappels automatiques par email (Laravel Scheduler)
+- [ ] Résumé IA du standup de l'équipe (OpenAI API)
+- [ ] Plans Free / Pro avec Laravel Cashier + Stripe
+- [ ] Admin panel avec Filament PHP
+- [ ] Extension Chrome pour soumettre rapidement
+
+---
+
+## Licence
+
+MIT
