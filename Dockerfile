@@ -28,5 +28,5 @@ RUN php artisan config:cache && php artisan route:cache && php artisan view:cach
 # Exposer le port
 EXPOSE 80
 
-# Commande de démarrage avec PHP built-in server
-CMD php artisan serve --host=0.0.0.0 --port=80
+# Commande de démarrage : migrations + serveur
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=80
