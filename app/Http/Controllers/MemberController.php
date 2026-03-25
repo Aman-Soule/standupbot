@@ -10,9 +10,35 @@ use Illuminate\Support\Str;
 
 class MemberController extends Controller
 {
+    /**
+     * Récupère le workspace actif de l'utilisateur connecté.
+     * Priorité : session → premier workspace en base.
+     */
+    private function getCurrentWorkspace(Request $request)
+    {
+        // 1. Essaie depuis la session (si déjà switché)
+        $workspace = $request->session()->get('current_workspace');
+
+        if ($workspace) {
+            return $workspace;
+        }
+
+        // 2. Fallback : premier workspace dont l'utilisateur est membre
+        $workspace = Auth::user()
+            ->workspaces()
+            ->first();
+
+        // 3. Si trouvé, on le sauvegarde en session pour les prochains appels
+        if ($workspace) {
+            $request->session()->put('current_workspace', $workspace);
+        }
+
+        return $workspace;
+    }
+
     public function index(Request $request)
     {
-        $workspace = $request->session()->get('current_workspace');
+        $workspace = $this->getCurrentWorkspace($request);
 
         abort_if(! $workspace, 404);
 
@@ -29,11 +55,15 @@ class MemberController extends Controller
 
     public function invite(Request $request)
     {
-        $workspace = $request->session()->get('current_workspace');
+        $workspace = $this->getCurrentWorkspace($request);
 
         abort_if(! $workspace, 404);
 
-        $this->authorize('admin', $workspace);
+        $member = WorkspaceMember::where('workspace_id', $workspace->id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        abort_if(! $member || $member->role !== 'admin', 403, 'Action réservée aux admins.');
 
         $request->validate([
             'email' => ['required', 'email'],
@@ -64,7 +94,7 @@ class MemberController extends Controller
 
     public function remove(Request $request, $userId)
     {
-        $workspace = $request->session()->get('current_workspace');
+        $workspace = $this->getCurrentWorkspace($request);
 
         abort_if(! $workspace, 404);
         abort_if($userId == Auth::id(), 403, 'Vous ne pouvez pas vous retirer vous-même.');
