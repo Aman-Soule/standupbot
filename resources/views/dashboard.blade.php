@@ -83,7 +83,7 @@
 
         {{-- Statut de l'équipe --}}
         <div>
-            <h2 style="font-size:13px; font-weight:600; color:#18181b; margin:0 0 12px;">Statut de l'équipe</h2>
+            <h2 style="font-size:13px; font-weight:600; color:#18181b; margin:0 0 12px;">Statut de l'équipe </h2>
             <div style="background:#fff; border:0.5px solid #e5e5e5; border-radius:10px; overflow:hidden;">
                 @foreach($members as $member)
                     @php $submitted = $todayStandups->pluck('user_id')->contains($member->id); @endphp
